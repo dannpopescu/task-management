@@ -1,21 +1,24 @@
 package com.danpopescu.taskmanagement.services;
 
 import com.danpopescu.taskmanagement.domain.Task;
+import com.danpopescu.taskmanagement.dto.TaskDTO;
+import com.danpopescu.taskmanagement.exceptions.TaskNotFoundException;
 import org.springframework.stereotype.Service;
-
-import java.util.Optional;
 
 @Service
 public interface TaskService {
 
     Task save(Task task);
 
-    Optional<Task> getById(Long id);
+    Task save(TaskDTO taskDTO);
 
-    Iterable<Task> getAll();
+    Task findById(Long id) throws TaskNotFoundException;
 
-    void deleteById(Long id);
+    Iterable<Task> findAll();
+
+    void deleteById(Long id) throws TaskNotFoundException;
 
     void deleteAll(Iterable<Task> tasks);
 
+    boolean existsById(Long id);
 }

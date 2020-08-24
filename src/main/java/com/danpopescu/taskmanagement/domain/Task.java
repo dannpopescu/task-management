@@ -1,6 +1,8 @@
 package com.danpopescu.taskmanagement.domain;
 
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -8,6 +10,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 
 @Data
+@NoArgsConstructor
 @Entity
 public class Task {
 
@@ -15,14 +18,14 @@ public class Task {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String name;
+    private String title;
 
-    private boolean completed;
+    private boolean done;
 
-    public Task() {
-    }
-
-    public Task(String name) {
-        this.name = name;
+    @Builder
+    public Task(Long id, String title, boolean done) {
+        this.id = id;
+        this.title = title;
+        this.done = done;
     }
 }

@@ -16,10 +16,10 @@ public class DataLoader implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-        taskService.save(new Task("Read PRO Spring 5"));
-        taskService.save(new Task("Finish SFG course"));
-        taskService.save(new Task("Read the Spring Security Guide"));
-        taskService.save(new Task("Write a generic motivation letter"));
-        taskService.save(new Task("Write to 10 recruiters"));
+        taskService.save(Task.builder().title("Read PRO Spring 5").build());
+        taskService.save(Task.builder().title("Finish SFG course").build());
+        taskService.save(Task.builder().title("Read the Spring Security Guide").build());
+        taskService.save(Task.builder().title("Write a generic motivation letter").build());
+        taskService.save(Task.builder().title("Write to 10 recruiters").build());
     }
 }
