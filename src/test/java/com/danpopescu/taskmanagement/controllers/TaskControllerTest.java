@@ -197,19 +197,12 @@ class TaskControllerTest {
     }
 
     @Test
-    void update_ShouldReturn201_WhenTaskCreated() throws Exception {
+    void update_ShouldReturn404_WhenTaskNotFound() throws Exception {
         TaskDTO taskDTO = TaskDTO.builder()
                 .id(1L)
                 .title("Lorem ipsum")
                 .build();
 
-        Task added = Task.builder()
-                .id(1L)
-                .title(taskDTO.getTitle())
-                .done(taskDTO.isDone())
-                .build();
-
-        when(taskService.save(taskDTO)).thenReturn(added);
         when(taskService.existsById(1L)).thenReturn(false);
 
         this.mockMvc.perform(
@@ -217,13 +210,8 @@ class TaskControllerTest {
                         .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON)
                         .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(taskDTO)))
-                .andExpect(status().isCreated())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.id", is(1)))
-                .andExpect(jsonPath("$.title", is(added.getTitle())))
-                .andExpect(jsonPath("$.done", is(added.isDone())));
+                .andExpect(status().isNotFound());
 
-        verify(taskService).save(taskDTO);
         verify(taskService).existsById(1L);
         verifyNoMoreInteractions(taskService);
     }

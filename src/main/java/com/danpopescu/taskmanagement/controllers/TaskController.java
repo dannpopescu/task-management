@@ -7,7 +7,6 @@ import com.danpopescu.taskmanagement.services.TaskService;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
 
 @RestController
@@ -42,9 +41,10 @@ public class TaskController {
     }
 
     @PutMapping("/{id}")
-    public TaskDTO update(@PathVariable Long id, @RequestBody TaskDTO taskDTO, HttpServletResponse response) {
-        HttpStatus status = taskService.existsById(id) ? HttpStatus.OK : HttpStatus.CREATED;
-        response.setStatus(status.value());
+    public TaskDTO update(@PathVariable Long id, @RequestBody TaskDTO taskDTO) throws TaskNotFoundException {
+        if (!taskService.existsById(id)) {
+            throw new TaskNotFoundException("Task Not Found");
+        }
         taskDTO.setId(id);
         return asDTO(taskService.save(taskDTO));
     }
