@@ -1,9 +1,9 @@
-package com.danpopescu.taskmanagement.controllers;
+package com.danpopescu.taskmanagement.web.controller;
 
 import com.danpopescu.taskmanagement.domain.Task;
-import com.danpopescu.taskmanagement.dto.TaskDTO;
-import com.danpopescu.taskmanagement.exceptions.TaskNotFoundException;
-import com.danpopescu.taskmanagement.services.TaskService;
+import com.danpopescu.taskmanagement.service.TaskService;
+import com.danpopescu.taskmanagement.web.exception.TaskNotFoundException;
+import com.danpopescu.taskmanagement.web.resource.TaskDTO;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 

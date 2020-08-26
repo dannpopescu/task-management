@@ -1,4 +1,4 @@
-package com.danpopescu.taskmanagement.exceptions;
+package com.danpopescu.taskmanagement.web.exception;
 
 public class TaskNotFoundException extends Exception {
 

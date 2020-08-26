@@ -1,8 +1,8 @@
-package com.danpopescu.taskmanagement.services;
+package com.danpopescu.taskmanagement.service;
 
 import com.danpopescu.taskmanagement.domain.Task;
-import com.danpopescu.taskmanagement.dto.TaskDTO;
-import com.danpopescu.taskmanagement.exceptions.TaskNotFoundException;
+import com.danpopescu.taskmanagement.web.exception.TaskNotFoundException;
+import com.danpopescu.taskmanagement.web.resource.TaskDTO;
 import org.springframework.stereotype.Service;
 
 @Service

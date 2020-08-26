@@ -1,9 +1,9 @@
-package com.danpopescu.taskmanagement.controllers;
+package com.danpopescu.taskmanagement.web.controller;
 
 import com.danpopescu.taskmanagement.domain.Task;
-import com.danpopescu.taskmanagement.dto.TaskDTO;
-import com.danpopescu.taskmanagement.exceptions.TaskNotFoundException;
-import com.danpopescu.taskmanagement.services.TaskService;
+import com.danpopescu.taskmanagement.service.TaskService;
+import com.danpopescu.taskmanagement.web.exception.TaskNotFoundException;
+import com.danpopescu.taskmanagement.web.resource.TaskDTO;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

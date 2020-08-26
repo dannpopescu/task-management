@@ -1,4 +1,4 @@
-package com.danpopescu.taskmanagement.dto;
+package com.danpopescu.taskmanagement.web.resource;
 
 import lombok.Builder;
 import lombok.Data;

@@ -1,4 +1,4 @@
-package com.danpopescu.taskmanagement.repositories;
+package com.danpopescu.taskmanagement.repository;
 
 import com.danpopescu.taskmanagement.domain.Task;
 import org.springframework.data.repository.CrudRepository;

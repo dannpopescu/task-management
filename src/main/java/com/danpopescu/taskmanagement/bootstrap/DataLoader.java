@@ -1,7 +1,7 @@
 package com.danpopescu.taskmanagement.bootstrap;
 
 import com.danpopescu.taskmanagement.domain.Task;
-import com.danpopescu.taskmanagement.services.TaskService;
+import com.danpopescu.taskmanagement.service.TaskService;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
