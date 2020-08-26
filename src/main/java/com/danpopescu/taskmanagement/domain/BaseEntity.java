@@ -13,9 +13,14 @@ import javax.persistence.MappedSuperclass;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class BaseEntity {
+public abstract class BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @Override
+    public String toString() {
+        return "{id=" + id + "}";
+    }
 }
