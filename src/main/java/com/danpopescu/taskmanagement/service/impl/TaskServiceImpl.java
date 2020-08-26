@@ -1,7 +1,7 @@
 package com.danpopescu.taskmanagement.service.impl;
 
 import com.danpopescu.taskmanagement.domain.Task;
-import com.danpopescu.taskmanagement.repository.TaskRepository;
+import com.danpopescu.taskmanagement.persistence.repository.TaskRepository;
 import com.danpopescu.taskmanagement.service.TaskService;
 import com.danpopescu.taskmanagement.web.exception.TaskNotFoundException;
 import com.danpopescu.taskmanagement.web.resource.TaskDTO;
@@ -30,8 +30,8 @@ public class TaskServiceImpl implements TaskService {
     private Task dtoToTask(TaskDTO taskDTO) {
         return Task.builder()
                 .id(taskDTO.getId())
-                .title(taskDTO.getTitle())
-                .done(taskDTO.isDone())
+                .name(taskDTO.getTitle())
+                .completed(taskDTO.isDone())
                 .build();
     }
 

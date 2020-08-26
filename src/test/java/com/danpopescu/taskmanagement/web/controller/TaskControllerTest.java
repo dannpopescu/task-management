@@ -37,11 +37,11 @@ class TaskControllerTest {
     void findAll_WhenFound_ShouldReturnTasks() throws Exception {
         Task first = Task.builder()
                 .id(1L)
-                .title("First Task")
+                .name("First Task")
                 .build();
         Task second = Task.builder()
                 .id(2L)
-                .title("Second Task")
+                .name("Second Task")
                 .build();
 
         when(taskService.findAll()).thenReturn(List.of(first, second));
@@ -82,7 +82,7 @@ class TaskControllerTest {
     void findById_WhenFound_ShouldReturnTask() throws Exception {
         Task task = Task.builder()
                 .id(1L)
-                .title("Lorem ipsum")
+                .name("Lorem ipsum")
                 .build();
 
         when(taskService.findById(task.getId())).thenReturn(task);
@@ -119,8 +119,8 @@ class TaskControllerTest {
 
         Task added = Task.builder()
                 .id(1L)
-                .title(taskDTO.getTitle())
-                .done(taskDTO.isDone())
+                .name(taskDTO.getTitle())
+                .completed(taskDTO.isDone())
                 .build();
 
         when(taskService.save(taskDTO)).thenReturn(added);
@@ -133,8 +133,8 @@ class TaskControllerTest {
                 .andExpect(status().isCreated())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.id", is(1)))
-                .andExpect(jsonPath("$.title", is(added.getTitle())))
-                .andExpect(jsonPath("$.done", is(added.isDone())));
+                .andExpect(jsonPath("$.title", is(added.getName())))
+                .andExpect(jsonPath("$.done", is(added.isCompleted())));
 
         verify(taskService).save(taskDTO);
         verifyNoMoreInteractions(taskService);
@@ -173,8 +173,8 @@ class TaskControllerTest {
 
         Task added = Task.builder()
                 .id(1L)
-                .title(taskDTO.getTitle())
-                .done(taskDTO.isDone())
+                .name(taskDTO.getTitle())
+                .completed(taskDTO.isDone())
                 .build();
 
         when(taskService.save(taskDTO)).thenReturn(added);
@@ -188,8 +188,8 @@ class TaskControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.id", is(1)))
-                .andExpect(jsonPath("$.title", is(added.getTitle())))
-                .andExpect(jsonPath("$.done", is(added.isDone())));
+                .andExpect(jsonPath("$.title", is(added.getName())))
+                .andExpect(jsonPath("$.done", is(added.isCompleted())));
 
         verify(taskService).save(taskDTO);
         verify(taskService).existsById(1L);

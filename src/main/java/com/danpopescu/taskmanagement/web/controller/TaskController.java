@@ -58,8 +58,8 @@ public class TaskController {
     private TaskDTO asDTO(Task task) {
         return TaskDTO.builder()
                 .id(task.getId())
-                .title(task.getTitle())
-                .done(task.isDone())
+                .title(task.getName())
+                .done(task.isCompleted())
                 .build();
     }
 }
