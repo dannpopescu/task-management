@@ -1,24 +1,18 @@
 package com.danpopescu.taskmanagement.domain;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 
-import javax.persistence.*;
+import javax.persistence.Entity;
+import javax.persistence.ManyToOne;
 import java.time.LocalDateTime;
 
 @Entity
 @Data
-@Builder
-@AllArgsConstructor
 @NoArgsConstructor
-public class Task {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+@ToString(callSuper = true)
+@EqualsAndHashCode(callSuper = true)
+public class Task extends BaseEntity {
 
     private String name;
 
@@ -32,4 +26,14 @@ public class Task {
 
     private LocalDateTime dateCompleted;
 
+    @Builder
+    public Task(Long id, String name, Project project, boolean completed,
+                LocalDateTime dateCreated, LocalDateTime dateCompleted) {
+        super(id);
+        this.name = name;
+        this.project = project;
+        this.completed = completed;
+        this.dateCreated = dateCreated;
+        this.dateCompleted = dateCompleted;
+    }
 }
