@@ -1,7 +1,6 @@
 package com.danpopescu.taskmanagement.domain;
 
 import lombok.*;
-import org.hibernate.annotations.CreationTimestamp;
 
 import javax.persistence.Entity;
 import javax.persistence.ManyToOne;
@@ -21,7 +20,6 @@ public class Task extends BaseEntity {
 
     private boolean completed;
 
-    @CreationTimestamp
     private LocalDateTime dateCreated;
 
     private LocalDateTime dateCompleted;

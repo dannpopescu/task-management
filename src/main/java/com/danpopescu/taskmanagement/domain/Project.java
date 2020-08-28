@@ -1,9 +1,6 @@
 package com.danpopescu.taskmanagement.domain;
 
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
+import lombok.*;
 
 import javax.persistence.Entity;
 
@@ -16,7 +13,9 @@ public class Project extends BaseEntity {
 
     private String name;
 
-    public Project(String name) {
+    @Builder
+    public Project(Long id, String name) {
+        super(id);
         this.name = name;
     }
 }

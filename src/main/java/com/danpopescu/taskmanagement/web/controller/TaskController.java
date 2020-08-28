@@ -2,64 +2,66 @@ package com.danpopescu.taskmanagement.web.controller;
 
 import com.danpopescu.taskmanagement.domain.Task;
 import com.danpopescu.taskmanagement.service.TaskService;
-import com.danpopescu.taskmanagement.web.exception.TaskNotFoundException;
-import com.danpopescu.taskmanagement.web.resource.TaskDTO;
-import org.springframework.http.HttpStatus;
+import com.danpopescu.taskmanagement.web.exception.ResourceNotFoundException;
+import com.danpopescu.taskmanagement.web.mapper.TaskMapper;
+import com.danpopescu.taskmanagement.web.resource.input.TaskResourceInput;
+import com.danpopescu.taskmanagement.web.resource.input.TaskResourceOutput;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.util.UriComponentsBuilder;
 
-import java.util.ArrayList;
+import java.net.URI;
+import java.util.Set;
 
 @RestController
 @RequestMapping("/tasks")
+@RequiredArgsConstructor
 public class TaskController {
 
-    private final TaskService taskService;
+    private final TaskService service;
+    private final TaskMapper mapper;
 
-    public TaskController(TaskService taskService) {
-        this.taskService = taskService;
-    }
-
-    @GetMapping({"", "/"})
-    public Iterable<TaskDTO> findAll() {
-        return asDTOs(taskService.findAll());
+    @GetMapping
+    public Set<TaskResourceOutput> findAll() {
+        Set<Task> tasks = service.findAll();
+        return mapper.asOutput(tasks);
     }
 
     @GetMapping("/{id}")
-    public TaskDTO findById(@PathVariable Long id) throws TaskNotFoundException {
-        return asDTO(taskService.findById(id));
+    public TaskResourceOutput findById(@PathVariable Long id) {
+        Task task = service.findById(id).orElseThrow(ResourceNotFoundException::new);
+        return mapper.asOutput(task);
     }
 
-    @PostMapping({"", "/"})
-    @ResponseStatus(HttpStatus.CREATED)
-    public TaskDTO create(@RequestBody TaskDTO taskDTO) {
-        return asDTO(taskService.save(taskDTO));
+    @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<TaskResourceOutput> create(@RequestBody TaskResourceInput taskResource,
+                                                     UriComponentsBuilder uriComponentsBuilder) {
+
+        Task task = mapper.asTask(taskResource);
+        task = service.save(task);
+
+        URI location = uriComponentsBuilder
+                .path("/tasks/{id}")
+                .buildAndExpand(task.getId())
+                .toUri();
+
+        return ResponseEntity.created(location).body(mapper.asOutput(task));
+    }
+
+    @PutMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<TaskResourceOutput> replace(@PathVariable Long id,
+                                                      @RequestBody TaskResourceInput resourceInput) {
+        Task task = service.findById(id).orElseThrow(ResourceNotFoundException::new);
+        task = mapper.updateTask(task, resourceInput);
+        service.save(task);
+        return ResponseEntity.noContent().build();
     }
 
     @DeleteMapping("/{id}")
-    public void deleteTask(@PathVariable Long id) throws TaskNotFoundException {
-        taskService.deleteById(id);
-    }
-
-    @PutMapping("/{id}")
-    public TaskDTO update(@PathVariable Long id, @RequestBody TaskDTO taskDTO) throws TaskNotFoundException {
-        if (!taskService.existsById(id)) {
-            throw new TaskNotFoundException("Task Not Found");
-        }
-        taskDTO.setId(id);
-        return asDTO(taskService.save(taskDTO));
-    }
-
-    private Iterable<TaskDTO> asDTOs(Iterable<Task> tasks) {
-        ArrayList<TaskDTO> taskDTOs = new ArrayList<>();
-        tasks.forEach(task -> taskDTOs.add(asDTO(task)));
-        return taskDTOs;
-    }
-
-    private TaskDTO asDTO(Task task) {
-        return TaskDTO.builder()
-                .id(task.getId())
-                .title(task.getName())
-                .done(task.isCompleted())
-                .build();
+    public ResponseEntity<Void> delete(@PathVariable Long id) {
+        service.deleteById(id);
+        return ResponseEntity.noContent().build();
     }
 }

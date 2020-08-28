@@ -3,9 +3,13 @@ package com.danpopescu.taskmanagement.service.impl;
 import com.danpopescu.taskmanagement.domain.Task;
 import com.danpopescu.taskmanagement.persistence.repository.TaskRepository;
 import com.danpopescu.taskmanagement.service.TaskService;
-import com.danpopescu.taskmanagement.web.exception.TaskNotFoundException;
+import com.danpopescu.taskmanagement.web.exception.ResourceNotFoundException;
 import com.danpopescu.taskmanagement.web.resource.TaskDTO;
 import org.springframework.stereotype.Service;
+
+import java.util.HashSet;
+import java.util.Optional;
+import java.util.Set;
 
 @Service
 public class TaskServiceImpl implements TaskService {
@@ -36,19 +40,21 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
-    public Task findById(Long id) throws TaskNotFoundException {
-        return taskRepository.findById(id).orElseThrow(() -> new TaskNotFoundException("Task Not Found"));
+    public Optional<Task> findById(Long id) {
+        return taskRepository.findById(id);
     }
 
     @Override
-    public Iterable<Task> findAll() {
-        return taskRepository.findAll();
+    public Set<Task> findAll() {
+        Set<Task> tasks = new HashSet<>();
+        taskRepository.findAll().forEach(tasks::add);
+        return tasks;
     }
 
     @Override
-    public void deleteById(Long id) throws TaskNotFoundException {
+    public void deleteById(Long id) {
         if (!taskRepository.existsById(id)) {
-            throw new TaskNotFoundException("Task Not Found");
+            throw new ResourceNotFoundException();
         }
         taskRepository.deleteById(id);
     }
