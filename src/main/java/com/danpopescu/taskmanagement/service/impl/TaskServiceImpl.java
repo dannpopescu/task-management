@@ -4,7 +4,6 @@ import com.danpopescu.taskmanagement.domain.Task;
 import com.danpopescu.taskmanagement.persistence.repository.TaskRepository;
 import com.danpopescu.taskmanagement.service.TaskService;
 import com.danpopescu.taskmanagement.web.exception.ResourceNotFoundException;
-import com.danpopescu.taskmanagement.web.resource.TaskDTO;
 import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
@@ -23,20 +22,6 @@ public class TaskServiceImpl implements TaskService {
     @Override
     public Task save(Task task) {
         return taskRepository.save(task);
-    }
-
-    @Override
-    public Task save(TaskDTO taskDTO) {
-        Task task = dtoToTask(taskDTO);
-        return taskRepository.save(task);
-    }
-
-    private Task dtoToTask(TaskDTO taskDTO) {
-        return Task.builder()
-                .id(taskDTO.getId())
-                .name(taskDTO.getTitle())
-                .completed(taskDTO.isDone())
-                .build();
     }
 
     @Override

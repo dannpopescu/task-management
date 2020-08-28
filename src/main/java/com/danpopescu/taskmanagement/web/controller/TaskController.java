@@ -5,7 +5,7 @@ import com.danpopescu.taskmanagement.service.TaskService;
 import com.danpopescu.taskmanagement.web.exception.ResourceNotFoundException;
 import com.danpopescu.taskmanagement.web.mapper.TaskMapper;
 import com.danpopescu.taskmanagement.web.resource.input.TaskResourceInput;
-import com.danpopescu.taskmanagement.web.resource.input.TaskResourceOutput;
+import com.danpopescu.taskmanagement.web.resource.output.TaskResourceOutput;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
