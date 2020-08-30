@@ -19,6 +19,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
 import javax.json.Json;
+import javax.json.JsonMergePatch;
 import javax.json.JsonPatch;
 import java.time.LocalDateTime;
 import java.util.HashSet;
@@ -338,6 +339,78 @@ class TaskControllerTest {
                         .contentType(PatchMediaType.APPLICATION_JSON_PATCH)
                         .characterEncoding("utf-8")
                         .content(patch.toString()))
+                .andExpect(status().isNotFound())
+                .andDo(print());
+
+        verify(service).findById(TASK_ID);
+        verifyNoMoreInteractions(service);
+        verifyNoInteractions(mapper);
+        verifyNoInteractions(patchHelper);
+    }
+
+    @Test
+    void mergePatch_ShouldReturn200_WhenPatched() throws Exception {
+        Task task = Task.builder()
+                .id(TASK_ID)
+                .name("Random Task")
+                .dateCreated(LocalDateTime.now())
+                .completed(true)
+                .dateCompleted(LocalDateTime.now())
+                .build();
+
+        Task updatedTask = Task.builder()
+                .id(TASK_ID)
+                .name("Updated Random Task")
+                .dateCreated(task.getDateCreated())
+                .build();
+
+        JsonMergePatch patch = Json.createMergePatch(Json.createObjectBuilder()
+                .add("name", "Updated Random Task")
+                .add("completed", false)
+                .addNull("dateCompleted")
+                .build());
+
+        TaskResourceOutput output = asTaskResourceOutput(updatedTask);
+
+        when(service.findById(TASK_ID)).thenReturn(Optional.of(task));
+        when(patchHelper.mergePatch(any(), eq(task), eq(Task.class))).thenReturn(updatedTask);
+        when(service.save(updatedTask)).thenReturn(updatedTask);
+        when(mapper.asOutput(updatedTask)).thenReturn(output);
+
+        this.mockMvc.perform(
+                patch("/tasks/{id}", TASK_ID)
+                        .contentType(PatchMediaType.APPLICATION_MERGE_PATCH)
+                        .characterEncoding("utf-8")
+                        .content(patch.toJsonValue().toString()))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(content().string(objectMapper.writeValueAsString(output)))
+                .andDo(print());
+
+        verify(service).findById(TASK_ID);
+        verify(patchHelper).mergePatch(any(), eq(task), eq(Task.class));
+        verify(service).save(updatedTask);
+        verify(mapper).asOutput(updatedTask);
+        verifyNoMoreInteractions(service);
+        verifyNoMoreInteractions(patchHelper);
+        verifyNoMoreInteractions(mapper);
+    }
+
+    @Test
+    void mergePatch_ShouldReturn404_WhenNotFound() throws Exception {
+        JsonMergePatch patch = Json.createMergePatch(Json.createObjectBuilder()
+                .add("name", "Updated Random Task")
+                .add("completed", false)
+                .addNull("dateCompleted")
+                .build());
+
+        when(service.findById(TASK_ID)).thenReturn(Optional.empty());
+
+        this.mockMvc.perform(
+                patch("/tasks/{id}", TASK_ID)
+                        .contentType(PatchMediaType.APPLICATION_MERGE_PATCH)
+                        .characterEncoding("utf-8")
+                        .content(patch.toJsonValue().toString()))
                 .andExpect(status().isNotFound())
                 .andDo(print());
 

@@ -15,6 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import javax.json.JsonMergePatch;
 import javax.json.JsonPatch;
 import java.net.URI;
 import java.util.Set;
@@ -80,6 +81,17 @@ public class TaskController {
 
         Task task = service.findById(id).orElseThrow(ResourceNotFoundException::new);
         Task updated = patchHelper.patch(mergePatchDocument, task, Task.class);
+        service.save(updated);
+        return ResponseEntity.ok(taskMapper.asOutput(updated));
+    }
+
+    @PatchMapping(path = "/{id}", consumes = PatchMediaType.APPLICATION_MERGE_PATCH_VALUE,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<TaskResourceOutput> mergePatch(@PathVariable Long id,
+                                                         @RequestBody JsonMergePatch patchDocument) {
+
+        Task task = service.findById(id).orElseThrow(ResourceNotFoundException::new);
+        Task updated = patchHelper.mergePatch(patchDocument, task, Task.class);
         service.save(updated);
         return ResponseEntity.ok(taskMapper.asOutput(updated));
     }
