@@ -3,10 +3,12 @@ package com.danpopescu.taskmanagement.web.controller;
 import com.danpopescu.taskmanagement.domain.Project;
 import com.danpopescu.taskmanagement.domain.Task;
 import com.danpopescu.taskmanagement.service.TaskService;
+import com.danpopescu.taskmanagement.web.PatchMediaType;
 import com.danpopescu.taskmanagement.web.exception.ResourceNotFoundException;
 import com.danpopescu.taskmanagement.web.mapper.TaskMapper;
 import com.danpopescu.taskmanagement.web.resource.input.TaskResourceInput;
 import com.danpopescu.taskmanagement.web.resource.output.TaskResourceOutput;
+import com.danpopescu.taskmanagement.web.util.PatchHelper;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Test;
@@ -16,6 +18,8 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
+import javax.json.Json;
+import javax.json.JsonPatch;
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Optional;
@@ -34,6 +38,9 @@ class TaskControllerTest {
 
     @MockBean
     TaskMapper mapper;
+
+    @MockBean
+    PatchHelper patchHelper;
 
     @Autowired
     MockMvc mockMvc;
@@ -268,6 +275,78 @@ class TaskControllerTest {
         verifyNoMoreInteractions(service);
     }
 
+    @Test
+    void jsonPatch_ShouldReturn200_WhenUpdated() throws Exception {
+        Task task = Task.builder()
+                .id(TASK_ID)
+                .name("Random Task")
+                .dateCreated(LocalDateTime.now())
+                .completed(true)
+                .dateCompleted(LocalDateTime.now())
+                .build();
+
+        Task updatedTask = Task.builder()
+                .id(TASK_ID)
+                .name("Updated Random Task")
+                .dateCreated(task.getDateCreated())
+                .build();
+
+        JsonPatch patch = Json.createPatchBuilder()
+                .replace("/name", "Updated Random Task")
+                .replace("/completed", false)
+                .remove("/dateCompleted")
+                .build();
+
+        TaskResourceOutput output = asTaskResourceOutput(updatedTask);
+
+        when(service.findById(TASK_ID)).thenReturn(Optional.of(task));
+        when(patchHelper.patch(any(), eq(task), eq(Task.class))).thenReturn(updatedTask);
+        when(service.save(updatedTask)).thenReturn(updatedTask);
+        when(mapper.asOutput(updatedTask)).thenReturn(output);
+
+        this.mockMvc.perform(
+                patch("/tasks/{id}", TASK_ID)
+                        .contentType(PatchMediaType.APPLICATION_JSON_PATCH)
+                        .characterEncoding("utf-8")
+                        .content(patch.toString()))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(content().string(objectMapper.writeValueAsString(output)))
+                .andDo(print());
+
+        verify(service).findById(TASK_ID);
+        verify(patchHelper).patch(any(), eq(task), eq(Task.class));
+        verify(service).save(updatedTask);
+        verify(mapper).asOutput(updatedTask);
+        verifyNoMoreInteractions(service);
+        verifyNoMoreInteractions(patchHelper);
+        verifyNoMoreInteractions(mapper);
+    }
+
+    @Test
+    void jsonPatch_ShouldReturn404_WhenNotFound() throws Exception {
+        JsonPatch patch = Json.createPatchBuilder()
+                .replace("/name", "Updated Random Task")
+                .replace("/completed", false)
+                .remove("/dateCompleted")
+                .build();
+
+        when(service.findById(TASK_ID)).thenReturn(Optional.empty());
+
+        this.mockMvc.perform(
+                patch("/tasks/{id}", TASK_ID)
+                        .contentType(PatchMediaType.APPLICATION_JSON_PATCH)
+                        .characterEncoding("utf-8")
+                        .content(patch.toString()))
+                .andExpect(status().isNotFound())
+                .andDo(print());
+
+        verify(service).findById(TASK_ID);
+        verifyNoMoreInteractions(service);
+        verifyNoInteractions(mapper);
+        verifyNoInteractions(patchHelper);
+    }
+
     private Task asTask(TaskResourceInput resourceInput, Long id) {
         if (resourceInput.getDateCreated() == null) {
             resourceInput.setDateCreated(LocalDateTime.now());
@@ -287,7 +366,7 @@ class TaskControllerTest {
         return TaskResourceOutput.builder()
                 .id(task.getId())
                 .name(task.getName())
-                .project(task.getProject().getId())
+                .project(task.getProject() != null ? task.getProject().getId() : null)
                 .completed(task.isCompleted())
                 .dateCreated(task.getDateCreated())
                 .dateCompleted(task.getDateCompleted())
