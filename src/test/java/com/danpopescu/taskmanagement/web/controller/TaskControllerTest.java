@@ -28,7 +28,6 @@ import java.util.Set;
 
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(TaskController.class)
@@ -81,8 +80,7 @@ class TaskControllerTest {
                 get("/tasks"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(content().string(objectMapper.writeValueAsString(outputs)))
-                .andDo(print());
+                .andExpect(content().string(objectMapper.writeValueAsString(outputs)));
 
         verify(mapper).asOutput(tasks);
         verify(service).findAll();
@@ -100,8 +98,7 @@ class TaskControllerTest {
                 get("/tasks"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(content().string("[]"))
-                .andDo(print());
+                .andExpect(content().string("[]"));
 
         verify(mapper).asOutput(tasks);
         verify(service).findAll();
@@ -127,8 +124,7 @@ class TaskControllerTest {
                 get("/tasks/{id}", TASK_ID))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(content().string(objectMapper.writeValueAsString(output)))
-                .andDo(print());
+                .andExpect(content().string(objectMapper.writeValueAsString(output)));
 
         verify(mapper).asOutput(task);
         verify(service).findById(TASK_ID);
@@ -142,8 +138,7 @@ class TaskControllerTest {
 
         this.mockMvc.perform(
                 get("/tasks/{id}", TASK_ID))
-                .andExpect(status().isNotFound())
-                .andDo(print());
+                .andExpect(status().isNotFound());
 
         verify(service).findById(TASK_ID);
         verifyNoMoreInteractions(service);
@@ -181,8 +176,7 @@ class TaskControllerTest {
                 .andExpect(status().isCreated())
                 .andExpect(header().string("Location", Matchers.containsString("/tasks/1")))
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(content().string(objectMapper.writeValueAsString(output)))
-                .andDo(print());
+                .andExpect(content().string(objectMapper.writeValueAsString(output)));
 
         verify(mapper).asTask(input);
         verify(mapper).asOutput(added);
@@ -214,8 +208,7 @@ class TaskControllerTest {
                         .accept(MediaType.APPLICATION_JSON)
                         .characterEncoding("utf-8")
                         .content(objectMapper.writeValueAsString(input)))
-                .andExpect(status().isNoContent())
-                .andDo(print());
+                .andExpect(status().isNoContent());
 
         verify(service).findById(TASK_ID);
         verify(mapper).updateTask(foundTask, input);
@@ -242,8 +235,7 @@ class TaskControllerTest {
                         .accept(MediaType.APPLICATION_JSON)
                         .characterEncoding("utf-8")
                         .content(objectMapper.writeValueAsString(input)))
-                .andExpect(status().isNotFound())
-                .andDo(print());
+                .andExpect(status().isNotFound());
 
         verify(service).findById(1L);
         verifyNoMoreInteractions(service);
@@ -256,8 +248,7 @@ class TaskControllerTest {
 
         this.mockMvc.perform(
                 delete("/tasks/{id}", TASK_ID))
-                .andExpect(status().isNoContent())
-                .andDo(print());
+                .andExpect(status().isNoContent());
 
         verify(service).deleteById(TASK_ID);
         verifyNoMoreInteractions(service);
@@ -269,8 +260,7 @@ class TaskControllerTest {
 
         this.mockMvc.perform(
                 delete("/tasks/{id}", TASK_ID))
-                .andExpect(status().isNotFound())
-                .andDo(print());
+                .andExpect(status().isNotFound());
 
         verify(service).deleteById(TASK_ID);
         verifyNoMoreInteractions(service);
@@ -312,8 +302,7 @@ class TaskControllerTest {
                         .content(patch.toString()))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(content().string(objectMapper.writeValueAsString(output)))
-                .andDo(print());
+                .andExpect(content().string(objectMapper.writeValueAsString(output)));
 
         verify(service).findById(TASK_ID);
         verify(patchHelper).patch(any(), eq(task), eq(Task.class));
@@ -339,8 +328,7 @@ class TaskControllerTest {
                         .contentType(PatchMediaType.APPLICATION_JSON_PATCH)
                         .characterEncoding("utf-8")
                         .content(patch.toString()))
-                .andExpect(status().isNotFound())
-                .andDo(print());
+                .andExpect(status().isNotFound());
 
         verify(service).findById(TASK_ID);
         verifyNoMoreInteractions(service);
@@ -384,8 +372,7 @@ class TaskControllerTest {
                         .content(patch.toJsonValue().toString()))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(content().string(objectMapper.writeValueAsString(output)))
-                .andDo(print());
+                .andExpect(content().string(objectMapper.writeValueAsString(output)));
 
         verify(service).findById(TASK_ID);
         verify(patchHelper).mergePatch(any(), eq(task), eq(Task.class));
@@ -411,8 +398,7 @@ class TaskControllerTest {
                         .contentType(PatchMediaType.APPLICATION_MERGE_PATCH)
                         .characterEncoding("utf-8")
                         .content(patch.toJsonValue().toString()))
-                .andExpect(status().isNotFound())
-                .andDo(print());
+                .andExpect(status().isNotFound());
 
         verify(service).findById(TASK_ID);
         verifyNoMoreInteractions(service);
@@ -434,8 +420,7 @@ class TaskControllerTest {
         this.mockMvc.perform(
                 put("/tasks/{id}/completed", TASK_ID)
                         .header("Content-Length", 0))
-                .andExpect(status().isNoContent())
-                .andDo(print());
+                .andExpect(status().isNoContent());
 
         verify(service).findById(TASK_ID);
         verify(service).save(task);
@@ -469,6 +454,61 @@ class TaskControllerTest {
 
         this.mockMvc.perform(
                 put("/tasks/{id}/completed", TASK_ID)
+                        .header("Content-Length", 0))
+                .andExpect(status().isNotFound());
+
+        verify(service).findById(TASK_ID);
+        verifyNoMoreInteractions(service);
+    }
+
+    @Test
+    void markUncompleted_ShouldReturn204_IfUncompletedSuccessfully() throws Exception {
+        Task task = Task.builder()
+                .id(TASK_ID)
+                .name("Random Task")
+                .dateCreated(LocalDateTime.now())
+                .completed(true)
+                .dateCompleted(LocalDateTime.now())
+                .build();
+
+        when(service.findById(TASK_ID)).thenReturn(Optional.ofNullable(task));
+        when(service.save(task)).thenReturn(task);
+
+        this.mockMvc.perform(
+                delete("/tasks/{id}/completed", TASK_ID)
+                        .header("Content-Length", 0))
+                .andExpect(status().isNoContent());
+
+        verify(service).findById(TASK_ID);
+        verify(service).save(task);
+        verifyNoMoreInteractions(service);
+    }
+
+    @Test
+    void markUncompleted_ShouldReturn400_WhenAlreadyUncompleted() throws Exception {
+        Task task = Task.builder()
+                .id(TASK_ID)
+                .name("Random Task")
+                .dateCreated(LocalDateTime.now())
+                .build();
+
+        when(service.findById(TASK_ID)).thenReturn(Optional.ofNullable(task));
+
+        this.mockMvc.perform(
+                delete("/tasks/{id}/completed", TASK_ID)
+                        .header("Content-Length", 0))
+                .andExpect(status().isBadRequest());
+
+        verify(service).findById(TASK_ID);
+        verifyNoMoreInteractions(service);
+    }
+
+    @Test
+    void markUncompleted_ShouldReturn404_WhenNotFound() throws Exception {
+        when(service.findById(TASK_ID)).thenReturn(Optional.empty());
+
+        this.mockMvc.perform(
+                delete("/tasks/{id}/completed", TASK_ID)
                         .header("Content-Length", 0))
                 .andExpect(status().isNotFound());
 

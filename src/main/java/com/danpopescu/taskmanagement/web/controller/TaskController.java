@@ -110,4 +110,16 @@ public class TaskController {
         service.save(task);
         return ResponseEntity.noContent().build();
     }
+
+    @DeleteMapping(path = "/{id}/completed")
+    public ResponseEntity<Void> markUncompleted(@PathVariable Long id) {
+        Task task = service.findById(id).orElseThrow(ResourceNotFoundException::new);
+        if (!task.isCompleted()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Task not completed");
+        }
+        task.setCompleted(false);
+        task.setDateCompleted(null);
+        service.save(task);
+        return ResponseEntity.noContent().build();
+    }
 }
