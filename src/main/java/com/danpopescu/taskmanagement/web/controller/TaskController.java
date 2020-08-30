@@ -10,14 +10,17 @@ import com.danpopescu.taskmanagement.web.resource.output.TaskResourceOutput;
 import com.danpopescu.taskmanagement.web.util.PatchHelper;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import javax.json.JsonMergePatch;
 import javax.json.JsonPatch;
 import java.net.URI;
+import java.time.LocalDateTime;
 import java.util.Set;
 
 @RestController
@@ -94,5 +97,17 @@ public class TaskController {
         Task updated = patchHelper.mergePatch(patchDocument, task, Task.class);
         service.save(updated);
         return ResponseEntity.ok(taskMapper.asOutput(updated));
+    }
+
+    @PutMapping(path = "/{id}/completed", headers = "content-length=0")
+    public ResponseEntity<Void> markCompleted(@PathVariable Long id) {
+        Task task = service.findById(id).orElseThrow(ResourceNotFoundException::new);
+        if (task.isCompleted()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Task already completed");
+        }
+        task.setCompleted(true);
+        task.setDateCompleted(LocalDateTime.now());
+        service.save(task);
+        return ResponseEntity.noContent().build();
     }
 }

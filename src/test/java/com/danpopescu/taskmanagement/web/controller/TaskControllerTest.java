@@ -420,6 +420,62 @@ class TaskControllerTest {
         verifyNoInteractions(patchHelper);
     }
 
+    @Test
+    void markCompleted_ShouldReturn204_IfCompletedSuccessfully() throws Exception {
+        Task task = Task.builder()
+                .id(TASK_ID)
+                .name("Random Task")
+                .dateCreated(LocalDateTime.now())
+                .build();
+
+        when(service.findById(TASK_ID)).thenReturn(Optional.ofNullable(task));
+        when(service.save(task)).thenReturn(task);
+
+        this.mockMvc.perform(
+                put("/tasks/{id}/completed", TASK_ID)
+                        .header("Content-Length", 0))
+                .andExpect(status().isNoContent())
+                .andDo(print());
+
+        verify(service).findById(TASK_ID);
+        verify(service).save(task);
+        verifyNoMoreInteractions(service);
+    }
+
+    @Test
+    void markCompleted_ShouldReturn400_WhenAlreadyCompleted() throws Exception {
+        Task task = Task.builder()
+                .id(TASK_ID)
+                .name("Random Task")
+                .dateCreated(LocalDateTime.now())
+                .dateCompleted(LocalDateTime.now())
+                .completed(true)
+                .build();
+
+        when(service.findById(TASK_ID)).thenReturn(Optional.ofNullable(task));
+
+        this.mockMvc.perform(
+                put("/tasks/{id}/completed", TASK_ID)
+                        .header("Content-Length", 0))
+                .andExpect(status().isBadRequest());
+
+        verify(service).findById(TASK_ID);
+        verifyNoMoreInteractions(service);
+    }
+
+    @Test
+    void markCompleted_ShouldReturn404_WhenNotFound() throws Exception {
+        when(service.findById(TASK_ID)).thenReturn(Optional.empty());
+
+        this.mockMvc.perform(
+                put("/tasks/{id}/completed", TASK_ID)
+                        .header("Content-Length", 0))
+                .andExpect(status().isNotFound());
+
+        verify(service).findById(TASK_ID);
+        verifyNoMoreInteractions(service);
+    }
+
     private Task asTask(TaskResourceInput resourceInput, Long id) {
         if (resourceInput.getDateCreated() == null) {
             resourceInput.setDateCreated(LocalDateTime.now());
