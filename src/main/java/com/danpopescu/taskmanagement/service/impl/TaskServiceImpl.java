@@ -6,6 +6,7 @@ import com.danpopescu.taskmanagement.service.TaskService;
 import com.danpopescu.taskmanagement.web.exception.ResourceNotFoundException;
 import org.springframework.stereotype.Service;
 
+import javax.validation.Valid;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
@@ -20,7 +21,7 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
-    public Task save(Task task) {
+    public Task save(@Valid Task task) {
         return taskRepository.save(task);
     }
 

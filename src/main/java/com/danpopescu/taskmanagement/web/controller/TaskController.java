@@ -51,6 +51,9 @@ public class TaskController {
                                                      UriComponentsBuilder uriComponentsBuilder) {
 
         Task task = taskMapper.asTask(taskResource);
+        if (task.getDateCreated() == null) {
+            task.setDateCompleted(LocalDateTime.now());
+        }
         task = service.save(task);
 
         URI location = uriComponentsBuilder

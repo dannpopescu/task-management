@@ -4,13 +4,14 @@ import com.danpopescu.taskmanagement.domain.Task;
 import com.danpopescu.taskmanagement.web.exception.ResourceNotFoundException;
 import org.springframework.stereotype.Service;
 
+import javax.validation.Valid;
 import java.util.Optional;
 import java.util.Set;
 
 @Service
 public interface TaskService {
 
-    Task save(Task task);
+    Task save(@Valid Task task);
 
     Optional<Task> findById(Long id);
 
