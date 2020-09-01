@@ -1,11 +1,11 @@
 package com.danpopescu.taskmanagement.web.mapper;
 
 import com.danpopescu.taskmanagement.domain.Task;
+import com.danpopescu.taskmanagement.web.resource.input.CreateTaskDetails;
 import com.danpopescu.taskmanagement.web.resource.input.TaskResourceInput;
 import com.danpopescu.taskmanagement.web.resource.output.TaskResourceOutput;
 import org.mapstruct.InjectionStrategy;
 import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 
 import java.time.LocalDateTime;
@@ -16,8 +16,9 @@ import java.util.Set;
         imports = LocalDateTime.class)
 public interface TaskMapper {
 
-    @Mapping(target = "dateCreated", source = "dateCreated", defaultExpression = "java(LocalDateTime.now())")
     Task asTask(TaskResourceInput resourceInput);
+
+    Task asTask(CreateTaskDetails taskDetails);
 
     Task updateTask(@MappingTarget Task task, TaskResourceInput resourceInput);
 

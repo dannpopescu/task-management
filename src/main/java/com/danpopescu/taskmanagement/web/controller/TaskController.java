@@ -5,6 +5,7 @@ import com.danpopescu.taskmanagement.service.TaskService;
 import com.danpopescu.taskmanagement.web.PatchMediaType;
 import com.danpopescu.taskmanagement.web.exception.ResourceNotFoundException;
 import com.danpopescu.taskmanagement.web.mapper.TaskMapper;
+import com.danpopescu.taskmanagement.web.resource.input.CreateTaskDetails;
 import com.danpopescu.taskmanagement.web.resource.input.TaskResourceInput;
 import com.danpopescu.taskmanagement.web.resource.output.TaskResourceOutput;
 import com.danpopescu.taskmanagement.web.util.PatchHelper;
@@ -47,13 +48,11 @@ public class TaskController {
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<TaskResourceOutput> create(@RequestBody TaskResourceInput taskResource,
+    public ResponseEntity<TaskResourceOutput> create(@RequestBody CreateTaskDetails taskDetails,
                                                      UriComponentsBuilder uriComponentsBuilder) {
 
-        Task task = taskMapper.asTask(taskResource);
-        if (task.getDateCreated() == null) {
-            task.setDateCompleted(LocalDateTime.now());
-        }
+        Task task = taskMapper.asTask(taskDetails);
+        task.setDateCreated(LocalDateTime.now());
         task = service.save(task);
 
         URI location = uriComponentsBuilder

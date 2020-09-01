@@ -6,6 +6,7 @@ import com.danpopescu.taskmanagement.service.TaskService;
 import com.danpopescu.taskmanagement.web.PatchMediaType;
 import com.danpopescu.taskmanagement.web.exception.ResourceNotFoundException;
 import com.danpopescu.taskmanagement.web.mapper.TaskMapper;
+import com.danpopescu.taskmanagement.web.resource.input.CreateTaskDetails;
 import com.danpopescu.taskmanagement.web.resource.input.TaskResourceInput;
 import com.danpopescu.taskmanagement.web.resource.output.TaskResourceOutput;
 import com.danpopescu.taskmanagement.web.util.PatchHelper;
@@ -147,39 +148,27 @@ class TaskControllerTest {
 
     @Test
     void create_ShouldReturn201_WhenCreated() throws Exception {
-        TaskResourceInput input = TaskResourceInput.builder()
-                .name("Lorem ipsum")
-                .project(PROJECT_ID)
-                .build();
+        CreateTaskDetails taskDetails = new CreateTaskDetails("Lorem ipsum", PROJECT_ID);
+        Task task = asTask(taskDetails, TASK_ID);
+        TaskResourceOutput output = asTaskResourceOutput(task);
 
-        Task task = asTask(input, null);
-
-        Task added = Task.builder()
-                .id(TASK_ID)
-                .name("Lorem ipsum")
-                .project(PROJECT)
-                .dateCreated(task.getDateCreated())
-                .build();
-
-        TaskResourceOutput output = asTaskResourceOutput(added);
-
-        when(mapper.asTask(input)).thenReturn(task);
-        when(service.save(task)).thenReturn(added);
-        when(mapper.asOutput(added)).thenReturn(output);
+        when(mapper.asTask(taskDetails)).thenReturn(task);
+        when(service.save(task)).thenReturn(task);
+        when(mapper.asOutput(task)).thenReturn(output);
 
         this.mockMvc.perform(
                 post("/tasks")
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON)
                         .characterEncoding("utf-8")
-                        .content(objectMapper.writeValueAsString(input)))
+                        .content(objectMapper.writeValueAsString(taskDetails)))
                 .andExpect(status().isCreated())
                 .andExpect(header().string("Location", Matchers.containsString("/tasks/1")))
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(content().string(objectMapper.writeValueAsString(output)));
 
-        verify(mapper).asTask(input);
-        verify(mapper).asOutput(added);
+        verify(mapper).asTask(taskDetails);
+        verify(mapper).asOutput(task);
         verify(service).save(task);
         verifyNoMoreInteractions(mapper);
         verifyNoMoreInteractions(service);
@@ -528,6 +517,15 @@ class TaskControllerTest {
                 .completed(resourceInput.isCompleted())
                 .dateCreated(LocalDateTime.now())
                 .dateCompleted(resourceInput.getDateCompleted())
+                .build();
+    }
+
+    private Task asTask(CreateTaskDetails taskDetails, Long id) {
+        return Task.builder()
+                .id(id)
+                .name(taskDetails.getName())
+                .project(PROJECT)
+                .dateCreated(LocalDateTime.now())
                 .build();
     }
 
