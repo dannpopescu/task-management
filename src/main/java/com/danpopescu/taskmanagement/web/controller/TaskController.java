@@ -9,7 +9,6 @@ import com.danpopescu.taskmanagement.web.resource.input.CreateTaskDetails;
 import com.danpopescu.taskmanagement.web.resource.input.TaskResourceInput;
 import com.danpopescu.taskmanagement.web.resource.output.TaskResourceOutput;
 import com.danpopescu.taskmanagement.web.util.PatchHelper;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -31,7 +30,6 @@ public class TaskController {
 
     private final TaskService service;
     private final TaskMapper taskMapper;
-    private final ObjectMapper objectMapper;
     private final PatchHelper patchHelper;
 
     @GetMapping

@@ -6,7 +6,9 @@ import com.danpopescu.taskmanagement.service.ProjectService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.HashSet;
 import java.util.Optional;
+import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
@@ -25,8 +27,10 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-    public Iterable<Project> findAll() {
-        return projectRepository.findAll();
+    public Set<Project> findAll() {
+        Set<Project> projects = new HashSet<>();
+        projectRepository.findAll().forEach(projects::add);
+        return projects;
     }
 
     @Override

@@ -3,6 +3,7 @@ package com.danpopescu.taskmanagement.service;
 import com.danpopescu.taskmanagement.domain.Project;
 
 import java.util.Optional;
+import java.util.Set;
 
 public interface ProjectService {
 
@@ -10,7 +11,7 @@ public interface ProjectService {
 
     Optional<Project> findById(Long id);
 
-    Iterable<Project> findAll();
+    Set<Project> findAll();
 
     void deleteById(Long id);
 
