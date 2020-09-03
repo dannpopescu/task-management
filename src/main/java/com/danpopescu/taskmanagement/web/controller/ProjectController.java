@@ -29,7 +29,8 @@ public class ProjectController {
 
     @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ProjectResourceOutput findById(@PathVariable Long id) {
-        Project project = service.findById(id).orElseThrow(ResourceNotFoundException::new);
+        Project project = service.findById(id).orElseThrow(() -> new ResourceNotFoundException(String.format("Project " +
+                "with id=%d not found", id)));
         return mapper.asOutput(project);
     }
 }

@@ -40,7 +40,8 @@ public class TaskController {
 
     @GetMapping("/{id}")
     public TaskResourceOutput findById(@PathVariable Long id) {
-        Task task = service.findById(id).orElseThrow(ResourceNotFoundException::new);
+        Task task = service.findById(id).orElseThrow(() -> new ResourceNotFoundException(String.format("Task " +
+                "with id=%d not found", id)));
         return taskMapper.asOutput(task);
     }
 
@@ -65,7 +66,8 @@ public class TaskController {
             produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<TaskResourceOutput> replace(@PathVariable Long id,
                                                       @RequestBody TaskResourceInput resourceInput) {
-        Task task = service.findById(id).orElseThrow(ResourceNotFoundException::new);
+        Task task = service.findById(id).orElseThrow(() -> new ResourceNotFoundException(String.format("Task " +
+                "with id=%d not found", id)));
         task = taskMapper.updateTask(task, resourceInput);
         service.save(task);
         return ResponseEntity.noContent().build();
@@ -82,7 +84,8 @@ public class TaskController {
     public ResponseEntity<TaskResourceOutput> jsonPatch(@PathVariable Long id,
                                                         @RequestBody JsonPatch mergePatchDocument) {
 
-        Task task = service.findById(id).orElseThrow(ResourceNotFoundException::new);
+        Task task = service.findById(id).orElseThrow(() -> new ResourceNotFoundException(String.format("Task " +
+                "with id=%d not found", id)));
         Task updated = patchHelper.patch(mergePatchDocument, task, Task.class);
         service.save(updated);
         return ResponseEntity.ok(taskMapper.asOutput(updated));
@@ -93,7 +96,8 @@ public class TaskController {
     public ResponseEntity<TaskResourceOutput> mergePatch(@PathVariable Long id,
                                                          @RequestBody JsonMergePatch patchDocument) {
 
-        Task task = service.findById(id).orElseThrow(ResourceNotFoundException::new);
+        Task task = service.findById(id).orElseThrow(() -> new ResourceNotFoundException(String.format("Task " +
+                "with id=%d not found", id)));
         Task updated = patchHelper.mergePatch(patchDocument, task, Task.class);
         service.save(updated);
         return ResponseEntity.ok(taskMapper.asOutput(updated));
@@ -101,7 +105,8 @@ public class TaskController {
 
     @PutMapping(path = "/{id}/completed", headers = "content-length=0")
     public ResponseEntity<Void> markCompleted(@PathVariable Long id) {
-        Task task = service.findById(id).orElseThrow(ResourceNotFoundException::new);
+        Task task = service.findById(id).orElseThrow(() -> new ResourceNotFoundException(String.format("Task " +
+                "with id=%d not found", id)));
         if (task.isCompleted()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Task already completed");
         }
@@ -113,7 +118,8 @@ public class TaskController {
 
     @DeleteMapping(path = "/{id}/completed")
     public ResponseEntity<Void> markUncompleted(@PathVariable Long id) {
-        Task task = service.findById(id).orElseThrow(ResourceNotFoundException::new);
+        Task task = service.findById(id).orElseThrow(() -> new ResourceNotFoundException(String.format("Task " +
+                "with id=%d not found", id)));
         if (!task.isCompleted()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Task not completed");
         }
